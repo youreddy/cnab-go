@@ -258,7 +258,11 @@ func injectParameters(action string, c *claim.Claim, env, files map[string]strin
 			}
 			continue
 		}
-		value := fmt.Sprintf("%v", rawval)
+		contents, err := json.Marshal(rawval)
+		if err != nil {
+			return err
+		}
+		value := strings.Trim(string(contents), "\"")
 		if param.Destination == nil {
 			// env is a CNAB_P_
 			env[fmt.Sprintf("CNAB_P_%s", strings.ToUpper(k))] = value
