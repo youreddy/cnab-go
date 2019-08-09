@@ -245,6 +245,7 @@ func opFromClaim(action string, stateless bool, c *claim.Claim, ii bundle.Invoca
 func injectParameters(action string, c *claim.Claim, env, files map[string]string) error {
 	for k, param := range c.Bundle.Parameters {
 		rawval, ok := c.Parameters[k]
+		fmt.Printf("RAW VALUE:%#v\n", rawval)
 		if !ok {
 			if param.Required && appliesToAction(action, param) {
 				return fmt.Errorf("missing required parameter %q for action %q", k, action)
@@ -255,7 +256,9 @@ func injectParameters(action string, c *claim.Claim, env, files map[string]strin
 		if err != nil {
 			return err
 		}
+		fmt.Printf("Contents before trim:%#v\n", contents)
 		value := strings.Trim(string(contents), "\"")
+		fmt.Printf("Contents after trim:%#v\n", value)
 		if param.Destination == nil {
 			// env is a CNAB_P_
 			env[fmt.Sprintf("CNAB_P_%s", strings.ToUpper(k))] = value
