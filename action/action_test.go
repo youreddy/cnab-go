@@ -140,6 +140,12 @@ func mockBundle() *bundle.Bundle {
 					Path: "/param/three",
 				},
 			},
+			"param_array": {
+				Definition: "ArrayParam",
+				Destination: &bundle.Location{
+					Path: "/param/array",
+				},
+			},
 		},
 		Actions: map[string]bundle.Action{
 			"test": {Modifies: true},
@@ -161,6 +167,7 @@ func TestOpFromClaim(t *testing.T) {
 		"param_one":   "oneval",
 		"param_two":   "twoval",
 		"param_three": "threeval",
+		"param_array": []string{"first-value", "second-value"},
 	}
 	invocImage := c.Bundle.InvocationImages[0]
 
@@ -180,12 +187,13 @@ func TestOpFromClaim(t *testing.T) {
 	is.Equal(op.Environment["CNAB_P_PARAM_ONE"], "oneval")
 	is.Equal(op.Files["/secret/two"], "I'm also a secret")
 	is.Equal(op.Files["/param/three"], "threeval")
+	is.Equal(op.Files["/param/array"], "[\"first-value\",\"second-value\"]")
 	is.Contains(op.Files, "/cnab/app/image-map.json")
 	is.Contains(op.Outputs, "/tmp/some/path")
 	var imgMap map[string]bundle.Image
 	is.NoError(json.Unmarshal([]byte(op.Files["/cnab/app/image-map.json"]), &imgMap))
 	is.Equal(c.Bundle.Images, imgMap)
-	is.Len(op.Parameters, 3)
+	is.Len(op.Parameters, 4)
 	is.Equal(os.Stdout, op.Out)
 }
 
